@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="demo.utils.dao.SysUserMapper">
+
+    <resultMap type="demo.utils.entity.SysUser" id="SysUserMap">
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="userCode" column="user_code" jdbcType="VARCHAR"/>
+        <result property="userLoginName" column="user_login_name" jdbcType="VARCHAR"/>
+        <result property="userName" column="user_name" jdbcType="VARCHAR"/>
+        <result property="orgId" column="org_id" jdbcType="INTEGER"/>
+        <result property="orgName" column="org_name" jdbcType="VARCHAR"/>
+        <result property="userPwd" column="user_pwd" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="sessionToken" column="session_token" jdbcType="VARCHAR"/>
+        <result property="delFlag" column="del_flag" jdbcType="BOOLEAN"/>
+        <result property="createUser" column="create_user" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="SysUserMap">
+        select user_id,
+                user_code,
+               user_login_name,
+               user_name,
+               org_id,
+               org_name,
+               user_pwd,
+               phone,
+               session_token,
+               del_flag,
+               create_user,
+               create_time,
+               update_time
+        from lkf.sys_user
+        where user_id = #{userId}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="SysUserMap">
+        select user_id,
+               user_code,
+               user_login_name,
+               user_name,
+               org_id,
+               org_name,
+               user_pwd,
+               phone,
+               session_token,
+               del_flag,
+               create_user,
+               create_time,
+               update_time
+        from lkf.sys_user limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="SysUserMap">
+        select
+        user_id, user_code, user_login_name, user_name, org_id, org_name, user_pwd, phone, session_token, del_flag,
+        create_user, create_time, update_time
+        from lkf.sys_user
+        <where>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="userCode != null and userCode != ''">
+                and user_code = #{userCode}
+            </if>
+            <if test="userLoginName != null and userLoginName != ''">
+                and user_login_name = #{userLoginName}
+            </if>
+            <if test="userName != null and userName != ''">
+                and user_name = #{userName}
+            </if>
+            <if test="orgId != null">
+                and org_id = #{orgId}
+            </if>
+            <if test="orgName != null and orgName != ''">
+                and org_name = #{orgName}
+            </if>
+            <if test="userPwd != null and userPwd != ''">
+                and user_pwd = #{userPwd}
+            </if>
+            <if test="phone != null and phone != ''">
+                and phone = #{phone}
+            </if>
+            <if test="sessionToken != null and sessionToken != ''">
+                and session_token = #{sessionToken}
+            </if>
+            <if test="delFlag != null">
+                and del_flag = #{delFlag}
+            </if>
+            <if test="createUser != null and createUser != ''">
+                and create_user = #{createUser}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateTime != null">
+                and update_time = #{updateTime}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="userId" useGeneratedKeys="true">
+        insert into lkf.sys_user(user_code, user_login_name, user_name, org_id, org_name, user_pwd, phone,
+                                 session_token, del_flag, create_user, create_time, update_time)
+        values (#{userCode}, #{userLoginName}, #{userName}, #{orgId}, #{orgName}, #{userPwd}, #{phone}, #{sessionToken},
+                #{delFlag}, #{createUser}, #{createTime}, #{updateTime})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="userId" useGeneratedKeys="true">
+        insert into lkf.sys_user(user_code, user_login_name, user_name, org_id, org_name, user_pwd, phone,
+        session_token, del_flag, create_user, create_time, update_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.userCode}, #{entity.userLoginName}, #{entity.userName}, #{entity.orgId}, #{entity.orgName},
+            #{entity.userPwd}, #{entity.phone}, #{entity.sessionToken}, #{entity.delFlag}, #{entity.createUser},
+            #{entity.createTime}, #{entity.updateTime})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="userId" useGeneratedKeys="true">
+        insert into lkf.sys_user(user_code, user_login_name, user_name, org_id, org_name, user_pwd, phone,
+        session_token, del_flag, create_user, create_time, update_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.userCode}, #{entity.userLoginName}, #{entity.userName}, #{entity.orgId}, #{entity.orgName},
+            #{entity.userPwd}, #{entity.phone}, #{entity.sessionToken}, #{entity.delFlag}, #{entity.createUser},
+            #{entity.createTime}, #{entity.updateTime})
+        </foreach>
+        on duplicate key update
+        user_code = values(user_code) , user_login_name = values(user_login_name) , user_name = values(user_name) ,
+        org_id = values(org_id) , org_name = values(org_name) , user_pwd = values(user_pwd) , phone = values(phone) ,
+        session_token = values(session_token) , del_flag = values(del_flag) , create_user = values(create_user) ,
+        create_time = values(create_time) , update_time = values(update_time)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update lkf.sys_user
+        <set>
+            <if test="userCode != null and userCode != ''">
+                user_code = #{userCode},
+            </if>
+            <if test="userLoginName != null and userLoginName != ''">
+                user_login_name = #{userLoginName},
+            </if>
+            <if test="userName != null and userName != ''">
+                user_name = #{userName},
+            </if>
+            <if test="orgId != null">
+                org_id = #{orgId},
+            </if>
+            <if test="orgName != null and orgName != ''">
+                org_name = #{orgName},
+            </if>
+            <if test="userPwd != null and userPwd != ''">
+                user_pwd = #{userPwd},
+            </if>
+            <if test="phone != null and phone != ''">
+                phone = #{phone},
+            </if>
+            <if test="sessionToken != null and sessionToken != ''">
+                session_token = #{sessionToken},
+            </if>
+            <if test="delFlag != null">
+                del_flag = #{delFlag},
+            </if>
+            <if test="createUser != null and createUser != ''">
+                create_user = #{createUser},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </set>
+        where user_id = #{userId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from lkf.sys_user
+        where user_id = #{userId}
+    </delete>
+
+</mapper>
+
